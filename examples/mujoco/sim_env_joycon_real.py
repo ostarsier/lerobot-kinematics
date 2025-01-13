@@ -3,7 +3,7 @@ import mujoco
 import mujoco.viewer
 import numpy as np
 import time
-from IK_SO100_box_gpos import rtb_Kinematics
+from lerobot_kinematics import lerobot_IK, lerobot_FK
 from pynput import keyboard
 import threading
 from collections import deque
@@ -28,13 +28,10 @@ os.environ["MUJOCO_GL"] = "egl"
 JOINT_NAMES = ["Rotation", "Pitch", "Elbow", "Wrist_Pitch", "Wrist_Roll", "Jaw"]
 
 # XML 模型的绝对路径
-xml_path = "/home/boxjod/lerobot/lerobot/sim_env/scene.xml"
+xml_path = "/home/aloha/data/robot/lerobot-kinematics/examples/mujoco/scene.xml"
 mjmodel = mujoco.MjModel.from_xml_path(xml_path)
 qpos_indices = np.array([mjmodel.jnt_qposadr[mjmodel.joint(name).id] for name in JOINT_NAMES])
 mjdata = mujoco.MjData(mjmodel)
-
-# 初始化运动学
-rtb_kinematics = rtb_Kinematics()
 
 # 定义关节控制增量（弧度）
 JOINT_INCREMENT = 0.01  # 可以根据需要调整
@@ -50,7 +47,8 @@ glimit = [[0.000, -0.4,  0.046, -3.1, -1.5, -1.5],
 init_qpos = np.array([0.0, -3.14, 3.14, 0.0, 1.57, -0.157])
 # init_qpos = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 target_qpos = init_qpos.copy() # mjdata.qpos[qpos_indices].copy()
-init_gpos = rtb_kinematics.rtb_forward_kinematics(init_qpos[1:5])
+# init_gpos = rtb_kinematics.rtb_forward_kinematics(init_qpos[1:5])
+init_gpos = lerobot_FK(init_qpos[1:5])
 target_gpos = init_gpos.copy() 
 
 # 线程安全锁
@@ -139,7 +137,8 @@ try:
                     yaw_reset = yaw_reset - 0.001 if yaw_reset > 0.001 else (yaw_reset + 0.001 if yaw_reset < 0-0.001 else yaw_reset)
                     
                     right_target_gpos = np.array([x_r, y_r, z_r, roll_r, pitch_r, 0.0])
-                    qpos_inv = rtb_kinematics.rtb_inverse_kinematics(mjdata.qpos[qpos_indices][1:5], right_target_gpos)
+                    # qpos_inv = rtb_kinematics.rtb_inverse_kinematics(mjdata.qpos[qpos_indices][1:5], right_target_gpos)
+                    qpos_inv = lerobot_IK(mjdata.qpos[qpos_indices][1:5], right_target_gpos)
                     target_qpos = np.concatenate(([yaw_reset,], qpos_inv, [gripper_state_r,]))
                     
                     mjdata.qpos[qpos_indices] = init_qpos
@@ -200,7 +199,8 @@ try:
             right_target_gpos = np.array([x_r, y_r, z_r, roll_r, pitch_r, 0.0])
             # print(f'{right_target_gpos=}')
             
-            qpos_inv = rtb_kinematics.rtb_inverse_kinematics(mjdata.qpos[qpos_indices][1:5], right_target_gpos)
+            # qpos_inv = rtb_kinematics.rtb_inverse_kinematics(mjdata.qpos[qpos_indices][1:5], right_target_gpos)
+            qpos_inv = lerobot_IK(mjdata.qpos[qpos_indices][1:5], right_target_gpos)
             if qpos_inv[0] != -1.0 and qpos_inv[1] != -1.0 and qpos_inv[2] != -1.0 and qpos_inv[3] != -1.0:
                 # target_qpos = np.concatenate((target_qpos[0:1], qpos_inv, [gripper_state_r,])) # 使用遥杆控制yaw
                 target_qpos = np.concatenate(([yaw_r,], qpos_inv, [gripper_state_r,])) # 使用陀螺仪控制yaw

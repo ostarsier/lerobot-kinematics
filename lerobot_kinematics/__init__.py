@@ -1,4 +1,4 @@
-from lerobot import *
+from .lerobot import *
 
 __all__ = [
     "lerobot_IK",

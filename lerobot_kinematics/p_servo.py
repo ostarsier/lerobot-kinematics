@@ -4,7 +4,7 @@ import numpy as np
 from spatialmath import SE3, base
 import math
 from typing import Union
-from joycon_lerobot.fknm import Angle_Axis
+from lerobot_kinematics.fknm import Angle_Axis
 
 ArrayLike = Union[list, np.ndarray, tuple, set]
 

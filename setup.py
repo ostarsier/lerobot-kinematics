@@ -3,7 +3,7 @@ import os
 import numpy
 
 extra_folders = [
-    "joycon_robotics/Kinematics/core",
+    "lerobot_kinematics/core",
 ]
 
 def package_files(directory):
@@ -19,27 +19,27 @@ for extra_folder in extra_folders:
     extra_files += package_files(extra_folder)
 
 frne = Extension(
-    "joycon_robotics.Kinematics.frne",
+    "lerobot_kinematics.frne",
     sources=[
-        "./joycon_robotics/Kinematics/core/vmath.c",
-        "./joycon_robotics/Kinematics/core/ne.c",
-        "./joycon_robotics/Kinematics/core/frne.c",
+        "./lerobot_kinematics/core/vmath.c",
+        "./lerobot_kinematics/core/ne.c",
+        "./lerobot_kinematics/core/frne.c",
     ],
-    include_dirs=["./joycon_robotics/Kinematics/core/"],
+    include_dirs=["./lerobot_kinematics/core/"],
 )
 
 fknm = Extension(
-    "joycon_robotics.Kinematics.fknm",
+    "lerobot_kinematics.fknm",
     sources=[
-        "./joycon_robotics/Kinematics/core/methods.cpp",
-        "./joycon_robotics/Kinematics/core/ik.cpp",
-        "./joycon_robotics/Kinematics/core/linalg.cpp",
-        "./joycon_robotics/Kinematics/core/fknm.cpp",
+        "./lerobot_kinematics/core/methods.cpp",
+        "./lerobot_kinematics/core/ik.cpp",
+        "./lerobot_kinematics/core/linalg.cpp",
+        "./lerobot_kinematics/core/fknm.cpp",
     ],
-    include_dirs=["./joycon_robotics/Kinematics/core/", numpy.get_include()],
+    include_dirs=["./lerobot_kinematics/core/", numpy.get_include()],
 )
 
 setup(
     ext_modules=[frne, fknm],
-    package_data={"joycon_robotics.Kinematics": extra_files},
+    package_data={"lerobot_kinematics": extra_files},
 )

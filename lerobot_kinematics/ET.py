@@ -10,9 +10,9 @@ import numpy as np
 from numpy.random import uniform
 from numpy.linalg import inv, det, cond, svd
 from spatialmath import SE3, SE2
-from joycon_lerobot.params import get_param
-from joycon_lerobot.IK import IK_GN, IK_LM, IK_NR, IK_QP
-from joycon_lerobot.fknm import (
+from lerobot_kinematics.params import get_param
+from lerobot_kinematics.IK import IK_GN, IK_LM, IK_NR, IK_QP
+from lerobot_kinematics.fknm import (
     ETS_init,
     ETS_fkine,
     ETS_jacob0,
@@ -46,14 +46,14 @@ from spatialmath.base import (
     getmatrix,
 )
 from copy import deepcopy
-from joycon_lerobot.fknm import ET_T, ET_init, ET_update
+from lerobot_kinematics.fknm import ET_T, ET_init, ET_update
 from spatialmath.base import getvector
 from spatialmath import SE3, SE2
 from typing import Optional, Callable, Union, TYPE_CHECKING, overload, List, Set, Tuple
 from typing_extensions import Literal as L
 
 # from spatialmath.base.types import ArrayLike
-from joycon_lerobot.types import ArrayLike, NDArray
+from lerobot_kinematics.types import ArrayLike, NDArray
 
 if TYPE_CHECKING:  # pragma: nocover
     import sympy

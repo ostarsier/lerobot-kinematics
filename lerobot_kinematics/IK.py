@@ -7,10 +7,10 @@
 import numpy as np
 from abc import ABC, abstractmethod
 from typing import Tuple, Union
-from joycon_lerobot.p_servo import angle_axis
+from lerobot_kinematics.p_servo import angle_axis
 from dataclasses import dataclass
 from spatialmath import SE3
-from joycon_lerobot.types import ArrayLike
+from lerobot_kinematics.types import ArrayLike
 
 try:
     import qpsolvers as qp

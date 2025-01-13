@@ -2,7 +2,7 @@ import numpy as np
 import math
 from math import sqrt as sqrt
 from spatialmath import SE3, SO3
-from Kinematics.ET import ET
+from lerobot_kinematics.ET import ET
 # 保留小数点后15位，并且在第15位后进行四舍五入
 def atan2(first, second):
     return round(math.atan2(first, second), 15)
@@ -59,7 +59,7 @@ so100 = get_robot()
 #设置关节限位
 so100.qlim = [[-2.2, -3.14158, -0.2,    -2.0,  -3.14158], 
               [2.2,   0.2,      3.14158, 1.8,  3.14158]]
-def FK(qpos_data):
+def lerobot_FK(qpos_data):
     # 获取末端执行器的齐次变换矩阵（T为SE3对象）
     T = so100.fkine(qpos_data)
     
@@ -82,7 +82,7 @@ def FK(qpos_data):
     return np.array([X, Y, Z, gamma, beta, alpha])
     
     
-def IK(q_now, target_pose):
+def lerobot_IK(q_now, target_pose):
     # x, y, z, roll, pitch, yaw = target_pose
     # r = R.from_euler('xyz', [roll, pitch, yaw], degrees=False)  # 欧拉角的顺序是 XYZ
     # R_mat = r.as_matrix()  # 获取旋转矩阵
