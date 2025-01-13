@@ -3,8 +3,7 @@
 
 ## Declaration
 
-This repository is a fork of the following projects:
-- [Robotics Toolbox for Python](https://github.com/petercorke/robotics-toolbox-python)
+This repository is a fork of the following projects [Robotics Toolbox for Python](https://github.com/petercorke/robotics-toolbox-python).
 
 ## A. Installation (Ubuntu 20.04)
 
