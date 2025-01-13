@@ -1,45 +1,45 @@
+# code by LinCC111 2025.1.13 Box2AI-Robotics copyright 盒桥智能 版权所有
+
 import os
 import mujoco
 import mujoco.viewer
 import numpy as np
 import time
-from IK_SO100_box import rtb_Kinematics
+
+from lerobot_kinematics import lerobot_IK, lerobot_FK
 from pynput import keyboard
 import threading
 
 np.set_printoptions(linewidth=200)
-# 设置 MuJoCo 渲染后端
+
+# Set the MuJoCo render backend
 os.environ["MUJOCO_GL"] = "egl"
 
-# 定义关节名称
+# Define joint names
 JOINT_NAMES = ["Rotation", "Pitch", "Elbow", "Wrist_Pitch", "Wrist_Roll", "Jaw"]
 
-# XML 模型的绝对路径
-xml_path = "/home/boxjod/lerobot/lerobot/sim_env/scene.xml"
+# Absolute path of the XML model
+xml_path = "./examples/scene.xml"
 mjmodel = mujoco.MjModel.from_xml_path(xml_path)
 qpos_indices = np.array([mjmodel.jnt_qposadr[mjmodel.joint(name).id] for name in JOINT_NAMES])
 mjdata = mujoco.MjData(mjmodel)
 
-# 初始化运动学
-rtb_kinematics = rtb_Kinematics()
+# Define joint control increment (in radians)
+JOINT_INCREMENT = 0.01  # Can be adjusted as needed
 
-# 定义关节控制增量（弧度）
-JOINT_INCREMENT = 0.01  # 可以根据需要调整
-
-# 定义关节限幅：
+# Define joint limits
 qlimit = [[-2.1, -3.0, -0.1, -2.0, -3.0, -0.1], 
-          [2.1,   0.2,   3.0, 1.8,  3.0, 1]]
+          [2.1, 0.2, 3.0, 1.8, 3.0, 1]]
 
-# 初始化目标关节位置
+# Initialize target joint positions
 init_qpos = np.array([0, -3.14, 3.14, 0, 0, -0.157])
-# init_qpos = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-target_qpos = init_qpos.copy() # mjdata.qpos[qpos_indices].copy()
-init_pose = rtb_kinematics.rtb_forward_kinematics(np.zeros(6))
+target_qpos = init_qpos.copy()  # Copy of initial joint positions
+init_pose = lerobot_FK(np.zeros(6))  # Initial pose from FK
 
-# 线程安全锁
+# Thread-safe lock
 lock = threading.Lock()
 
-# 定义键映射
+# Define key mappings for joint control
 key_to_joint_increase = {
     '1': 0,  # Rotation
     '2': 1,  # Pitch
@@ -58,26 +58,30 @@ key_to_joint_decrease = {
     'y': 5,  # Jaw
 }
 
-# 字典用于跟踪当前按下的键及其增减方向
+# Dictionary to track currently pressed keys and their direction
 keys_pressed = {}
 
+# Handle key press events
 def on_press(key):
     try:
-        k = key.char.lower()  # 转为小写以处理大写输入
+        k = key.char.lower()  # Convert to lowercase to handle both upper and lower case inputs
         if k in key_to_joint_increase:
             with lock:
-                keys_pressed[k] = 1  # 增加方向
+                keys_pressed[k] = 1  # Increase direction
         elif k in key_to_joint_decrease:
             with lock:
-                keys_pressed[k] = -1  # 减少方向
+                keys_pressed[k] = -1  # Decrease direction
         elif k == "0":
+            # Reset to initial joint positions
+            print(f'{k=}')
             with lock:
                 global target_qpos
                 target_qpos = init_qpos.copy()
-
+        
     except AttributeError:
-        pass  # 处理特殊键（如果需要）
+        pass  # Handle special keys if necessary
 
+# Handle key release events
 def on_release(key):
     try:
         k = key.char.lower()
@@ -85,21 +89,21 @@ def on_release(key):
             with lock:
                 del keys_pressed[k]
     except AttributeError:
-        pass  # 处理特殊键（如果需要）
+        pass  # Handle special keys if necessary
 
-# 启动键盘监听器在一个单独的线程
+# Start the keyboard listener in a separate thread
 listener = keyboard.Listener(on_press=on_press, on_release=on_release)
 listener.start()
-        
+
 try:
+    # Launch the MuJoCo viewer
     with mujoco.viewer.launch_passive(mjmodel, mjdata) as viewer:
         
         start = time.time()
-        t = 0
         while viewer.is_running() and time.time() - start < 1000:
             step_start = time.time()
-            
-            # 更新 target_qpos 基于当前按下的键
+
+            # Update target_qpos based on the keys currently pressed
             with lock:
                 for k, direction in keys_pressed.items():
                     if k in key_to_joint_increase:
@@ -110,43 +114,42 @@ try:
                     elif k in key_to_joint_decrease:
                         joint_idx = key_to_joint_decrease[k]
                         if target_qpos[joint_idx] > qlimit[0][joint_idx]:
-                            target_qpos[joint_idx] += JOINT_INCREMENT * direction  # direction 为 -1
+                            target_qpos[joint_idx] += JOINT_INCREMENT * direction  # direction is -1
 
-            # 前向和逆向运动学
-            # print(f'{target_qpos=}')
-            position = rtb_kinematics.rtb_forward_kinematics(target_qpos[:5])
-            print("tg_qpos:", [f"{x:.3f}" for x in target_qpos])
-            # print("fk_gpos:", [f"{x:.3f}" for x in position])
-            qpos_inv = rtb_kinematics.rtb_inverse_kinematics(target_qpos[:5], position)
+            # Forward and inverse kinematics
+            position = lerobot_FK(target_qpos[:5])
+            print("Target qpos:", [f"{x:.3f}" for x in target_qpos])
+            qpos_inv = lerobot_IK(target_qpos[:5], position)
             
-            # 使用逆解保护一下
-            if qpos_inv[0] != -1.0 and qpos_inv[1] != -1.0 and qpos_inv[2] != -1.0 and qpos_inv[3] != -1.0:
+            # Use inverse kinematics solution with validation
+            if np.all(qpos_inv != -1.0):  # Check if the inverse kinematics solution is valid
                 target_qpos = np.concatenate((qpos_inv, target_qpos[5:]))
                 mjdata.qpos[qpos_indices] = target_qpos
                 
-                # 步进模拟
-                mjdata.qpos[qpos_indices] = np.concatenate((qpos_inv,target_qpos[5:]))
+                # Step the simulation
+                mjdata.qpos[qpos_indices] = np.concatenate((qpos_inv, target_qpos[5:]))
                 mujoco.mj_step(mjmodel, mjdata)
 
-                # 更新查看器选项（例如，每秒切换一次接触点显示）
+                # Update viewer options (e.g., toggle contact point display every second)
                 with viewer.lock():
                     viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = int(mjdata.time % 2)
 
-                # 同步查看器
+                # Sync the viewer
                 viewer.sync()
-                position = rtb_kinematics.rtb_forward_kinematics(mjdata.qpos[qpos_indices]) 
-                print("fb_qpos:", [f"{x:.3f}" for x in mjdata.qpos[qpos_indices]])
+                position = lerobot_FK(mjdata.qpos[qpos_indices][:5])  # Get FK of the updated qpos
+                print("Current qpos:", [f"{x:.3f}" for x in mjdata.qpos[qpos_indices]])
                 print()
                 
-                target_gpos_last = target_qpos.copy() # 保存备份
+                target_gpos_last = target_qpos.copy()  # Backup the valid target_qpos
             else:
-                target_qpos = target_gpos_last.copy()
+                target_qpos = target_gpos_last.copy()  # Revert to the last valid position if IK fails
             
-            # 时间管理以维持模拟时间步
+            # Time management to maintain simulation timestep
             time_until_next_step = mjmodel.opt.timestep - (time.time() - step_start)
             if time_until_next_step > 0:
                 time.sleep(time_until_next_step)
+
 except KeyboardInterrupt:
-    print("用户中断了模拟。")
+    print("User interrupted the simulation.")
 finally:
-    listener.stop()
+    listener.stop()  # Stop the keyboard listener

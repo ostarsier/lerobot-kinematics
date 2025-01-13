@@ -1,3 +1,5 @@
+# code by LinCC111 2025.1.13 Box2AI-Robotics copyright 盒桥智能 版权所有
+
 import numpy as np
 
 import genesis as gs
@@ -17,12 +19,12 @@ plane = scene.add_entity(gs.morphs.Plane())
 light = scene.add_light(gs.morphs.Primitive()) 
 
 #添加机械臂
-so_100_right = scene.add_entity(gs.morphs.MJCF(file= 'sim_env/so_100.xml', pos=(-0.30, 0, 0.75), euler= (0, 0, 90)))
-so_100_left = scene.add_entity(gs.morphs.MJCF(file= 'sim_env/so_100.xml', pos=(0.30, 0, 0.75), euler= (0, 0, -90)))
+so_100_right = scene.add_entity(gs.morphs.MJCF(file= 'examples/so_100.xml', pos=(-0.30, 0, 0.75), euler= (0, 0, 90)))
+so_100_left = scene.add_entity(gs.morphs.MJCF(file= 'examples/so_100.xml', pos=(0.30, 0, 0.75), euler= (0, 0, -90)))
 
 # 添加桌子
-tablelegs = scene.add_entity(morph= gs.morphs.Mesh(file= 'sim_env/assets/table/tablelegs.obj', pos=(0, 0, 0), euler=(0, 0, 90), fixed= True), surface= gs.surfaces.Default(roughness= 0.7, diffuse_texture= gs.textures.ImageTexture(image_path= 'sim_env/assets/table/small_meta_table_diffuse.png')))
-tabletop = scene.add_entity( morph= gs.morphs.Mesh(file= 'sim_env/assets/table/tabletop.obj', pos=(0, 0, 0), euler=(0, 0, 90), fixed= True), surface= gs.surfaces.Default(roughness=0.7,  diffuse_texture= gs.textures.ImageTexture(image_path= 'sim_env/assets/table/small_meta_table_diffuse.png')))
+tablelegs = scene.add_entity(morph= gs.morphs.Mesh(file= 'examples/assets/table/tablelegs.obj', pos=(0, 0, 0), euler=(0, 0, 90), fixed= True), surface= gs.surfaces.Default(roughness= 0.7, diffuse_texture= gs.textures.ImageTexture(image_path= 'examples/assets/table/small_meta_table_diffuse.png')))
+tabletop = scene.add_entity( morph= gs.morphs.Mesh(file= 'examples/assets/table/tabletop.obj', pos=(0, 0, 0), euler=(0, 0, 90), fixed= True), surface= gs.surfaces.Default(roughness=0.7,  diffuse_texture= gs.textures.ImageTexture(image_path= 'examples/assets/table/small_meta_table_diffuse.png')))
 
 # 添加一个盒子
 red_square = scene.add_entity(
@@ -203,6 +205,3 @@ while(True):
             so_100_right.control_dofs_position(next_qpos, right_joint_idx)
             scene.step()
 
-# # 循环渲染
-# while(True):
-#     scene.step()

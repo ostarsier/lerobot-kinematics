@@ -1,33 +1,67 @@
-# joycon-robotics
 
-`joycon-robotics` 是一个用于 Lerobot SO100 ARM 的运动学库，为机器人提供了一套运动学计算模型。
+# LeRobot-Kinematics: Simple and Accurate Forward and Inverse Kinematics Examples for the Lerobot SO100 ARM
 
-## 目录结构
+## Declaration
+
+This repository is a fork of the following projects:
+- [Robotics Toolbox for Python](https://github.com/petercorke/robotics-toolbox-python)
 
 
-## 特性
+It is part of the work on [Constrained Behavior Cloning for Robotic Learning](https://arxiv.org/abs/2408.10568?context=cs.RO).
 
-- **运动学运算**：支持运动学算法，提供正向和逆向运动学求解。
-- **跨平台支持**：兼容 Linux、macOS 和 Windows 操作系统。
-- **高效矩阵运算**：使用 `numpy` 和 `scipy` 进行高效的矩阵计算。
 
-## 安装
+## Installation (Ubuntu 20.04)
 
- **从源码进行安装：**
-  ```git
-  git clone https://github.com/Lerobot-Robotics/joycon-robotics.git
-  cd joycon-robotics
+```bash
+  git clone https://github.com/box2ai-robotics/lerobot-kinematics.git
+  cd lerobot_kinematics
   pip install -e .
-  ```
+```
 
-## 使用示例
+## Examples
 
-### 
+We recommended to click on the terminal window with the mouse after startup and then enter the keys, to avoid that the keys in the departure mujoco change the configuration of the scene.
 
-## 参考
+### 1. qpos control
 
-在开发 `joycon-robotics` 时，我们参考并借鉴了以下开源库：
+Example of joint angle control, when opened the Mucojo visualization will appear and you can use the keyboard to control the corresponding angle change of the robot arm.
 
-- [**Robotics Toolbox for Python**](https://github.com/petercorke/robotics-toolbox-python)：这个库为我们提供了很多关于机器人运动学和控制的算法，极大地加速了我们的开发过程。
+```shell
+python examples/mujoco/sim_env_key_qpos.py
+```
 
-感谢这些开源项目的贡献，它们对我们的工作至关重要！
+- ``1, 2, 3, 4, 5, 6`` Increase the angle.
+
+- ``q, w, e, r, t, y`` Decrease Angle.
+
+Press and hold '0' to return to position
+
+
+### 2. gpos Control
+
+Example of end-posture control, where you can use the keyboard to control the end-posture changes of Lerobot in mucojo.
+
+```shell
+python examples/mujoco/sim_env_key_gpos.py
+```
+
+| Key | Action +            | Key | Action -            |
+|-----|---------------------|-----|---------------------|
+| `w` | Move Forward        | `s` | Move Backward       |
+| `a` | Move Right          | `d` | Move Left           |
+| `r` | Move Up             | `f` | Move Down           |
+| `e` | Roll +              | `q` | Roll -              |
+| `t` | Pitch +             | `g` | Pitch -             |
+| `z` | Gripper Open        | `c` | Gripper Close       |
+
+Press and hold '0' to return to position
+
+
+### 3. Real robot control
+
+Example of end-posture control, where you can use the keyboard to control the end-posture changes of Lerobot in mucojo.
+
+
+```shell
+python examples/mujoco/sim_env_key_gpos_real.py
+```
