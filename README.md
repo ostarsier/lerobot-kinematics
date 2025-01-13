@@ -10,7 +10,7 @@ This repository is a fork of the following projects:
 It is part of the work on [Constrained Behavior Cloning for Robotic Learning](https://arxiv.org/abs/2408.10568?context=cs.RO).
 
 
-## Installation (Ubuntu 20.04)
+## A. Installation (Ubuntu 20.04)
 
 ```bash
   git clone https://github.com/box2ai-robotics/lerobot-kinematics.git
@@ -18,16 +18,16 @@ It is part of the work on [Constrained Behavior Cloning for Robotic Learning](ht
   pip install -e .
 ```
 
-## Examples
+## B. Examples in simulation
 
 We recommended to click on the terminal window with the mouse after startup and then enter the keys, to avoid that the keys in the departure mujoco change the configuration of the scene.
 
-### 1. qpos control
+### (1) qpos control
 
 Example of joint angle control, when opened the Mucojo visualization will appear and you can use the keyboard to control the corresponding angle change of the robot arm.
 
 ```shell
-python examples/mujoco/sim_env_key_qpos.py
+python examples/lerobot_keycon_qpos.py
 ```
 
 - ``1, 2, 3, 4, 5, 6`` Increase the angle.
@@ -37,12 +37,12 @@ python examples/mujoco/sim_env_key_qpos.py
 Press and hold '0' to return to position
 
 
-### 2. gpos Control
+### (2) gpos Control
 
-Example of end-posture control, where you can use the keyboard to control the end-posture changes of Lerobot in mucojo.
+Example of Gripper Posture (gpos) control, where you can use the keyboard to control the end-posture changes of Lerobot in mucojo.
 
 ```shell
-python examples/mujoco/sim_env_key_gpos.py
+python examples/lerobot_keycon_gpos.py
 ```
 
 | Key | Action +            | Key | Action -            |
@@ -57,11 +57,24 @@ python examples/mujoco/sim_env_key_gpos.py
 Press and hold '0' to return to position
 
 
-### 3. Real robot control
+### (3) Genesis IK Control
 
 Example of end-posture control, where you can use the keyboard to control the end-posture changes of Lerobot in mucojo.
 
 
 ```shell
-python examples/mujoco/sim_env_key_gpos_real.py
+python examples/lerobot_genesis.py
 ```
+
+
+If this repository was helpful to you, please give us a little star and have a great time! ⭐ ⭐ ⭐ ⭐ ⭐
+
+## 3. Examples in Real
+
+Example of gripper posture (gpos) control, where you can use the keyboard to control the Lerobot's end posture changes in mucojo while going from simulation to physical control of a real Lerobot arm.
+
+```shell
+python examples/lerobot_keycon_gpos_real.py
+```
+
+If you're interested in this, you can try using the keyboard to collect data.
