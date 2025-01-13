@@ -1,0 +1,8 @@
+matplotlib
+
+mink
+h5py
+joycon-python
+loop_rate_limiters
+pyglm
+hid==1.0.4
