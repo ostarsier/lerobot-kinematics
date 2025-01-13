@@ -6,10 +6,6 @@
 This repository is a fork of the following projects:
 - [Robotics Toolbox for Python](https://github.com/petercorke/robotics-toolbox-python)
 
-
-It is part of the work on [Constrained Behavior Cloning for Robotic Learning](https://arxiv.org/abs/2408.10568?context=cs.RO).
-
-
 ## A. Installation (Ubuntu 20.04)
 
 ```bash
