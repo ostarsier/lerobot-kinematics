@@ -9,13 +9,17 @@ This repository is a fork of the following projects [Robotics Toolbox for Python
 
 ```bash
   git clone https://github.com/box2ai-robotics/lerobot-kinematics.git
-  cd lerobot_kinematics
+  cd lerobot-kinematics
   pip install -e .
 ```
 
 ## B. Examples in simulation
 
-We recommended to click on the terminal window with the mouse after startup and then enter the keys, to avoid that the keys in the departure mujoco change the configuration of the scene.
+We recommended to click on the terminal window with the mouse after startup and then enter the keys, to avoid that the keys in the departure [mujoco](https://github.com/google-deepmind/mujoco) change the configuration of the scene.
+
+```shell
+pip install mujoco==3.2.5
+```
 
 #### (1) qpos control
 
@@ -54,15 +58,26 @@ Press and hold '0' to return to position
 
 #### (3) Genesis IK Control
 
-Example of end-posture control, where you can use the keyboard to control the end-posture changes of Lerobot in mucojo.
+Example of Gripper Posture (gpos) control based on the Genesis positive inverse kinematics library.
 
 ```shell
 python examples/lerobot_genesis.py
 ```
 
+#### (4) Joycon Control
+
+This is an example of using joycon to control Lerobot in mucojo, if you want to use it, please install [joycon-robotics
+](https://github.com/box2ai-robotics/joycon-robotics) repository first!
+
+```shell
+python examples/lerobot_joycon_gpos.py
+```
+
 If this repository was helpful to you, please give us a little star and have a great time! ⭐ ⭐ ⭐ ⭐ ⭐
 
 ## C. Examples in Real
+
+#### (1) Keyboard Control in Real
 
 Example of gripper posture (gpos) control, where you can use the keyboard to control the Lerobot's end posture changes in mucojo while going from simulation to physical control of a real Lerobot arm.
 
@@ -71,3 +86,9 @@ python examples/lerobot_keycon_gpos_real.py
 ```
 
 If you're interested in this, you can try using the keyboard to collect data.
+
+#### (1) Joycon Control in Real
+
+```shell
+python examples/lerobot_joycon_gpos_real.py
+```

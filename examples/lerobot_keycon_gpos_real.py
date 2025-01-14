@@ -11,7 +11,7 @@ from pynput import keyboard
 import threading
 
 # For Feetech Motors
-from feetech import FeetechMotorsBus
+from lerobot_kinematics.lerobot.feetech import FeetechMotorsBus
 import json
 
 np.set_printoptions(linewidth=200)

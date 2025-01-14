@@ -138,7 +138,7 @@ try:
                                 target_gpos[position_idx] += POSITION_INSERMENT * direction
                                 
             print("target_gpos:", [f"{x:.3f}" for x in target_gpos])
-            fd_qpos = np.concatenate(([0.1010010,], mjdata.qpos[qpos_indices][1:5]))
+            fd_qpos = np.concatenate(([0.0,], mjdata.qpos[qpos_indices][1:5]))
             qpos_inv = lerobot_IK(fd_qpos, target_gpos)
             
             if np.all(qpos_inv != -1.0):  # Check if IK solution is valid
