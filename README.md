@@ -87,7 +87,7 @@ python examples/lerobot_keycon_gpos_real.py
 
 If you're interested in this, you can try using the keyboard to collect data.
 
-#### (1) Joycon Control in Real
+#### (2) Joycon Control in Real
 
 ```shell
 python examples/lerobot_joycon_gpos_real.py
