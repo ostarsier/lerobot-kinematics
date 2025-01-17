@@ -5,7 +5,7 @@ import mujoco
 import mujoco.viewer
 import numpy as np
 import time
-from lerobot_kinematics import lerobot_IK, lerobot_FK
+from lerobot_kinematics import lerobot_IK, lerobot_FK, get_robot2, feetech_arm
 
 from pynput import keyboard
 import threading
@@ -28,6 +28,8 @@ mjmodel = mujoco.MjModel.from_xml_path(xml_path)
 qpos_indices = np.array([mjmodel.jnt_qposadr[mjmodel.joint(name).id] for name in JOINT_NAMES])
 mjdata = mujoco.MjData(mjmodel)
 
+robot = get_robot2()
+
 # Define joint control increment (in radians)
 JOINT_INCREMENT = 0.005
 POSITION_INSERMENT = 0.0008
@@ -36,13 +38,13 @@ POSITION_INSERMENT = 0.0008
 qlimit = [[-2.1, -3.14, -0.1, -2.0, -3.1, -0.1],
           [2.1, 0.2, 3.14, 1.8, 3.1, 1.0]]
 
-glimit = [[0.000, -0.4, 0.046, -3.1, -1.5, -1.5],
-          [0.430, 0.4, 0.23, 3.1, 1.5, 1.5]]
+glimit = [[0.120, -0.4,  0.046, -3.1, -1.5, -1.5], 
+          [0.380,  0.4,  0.23,  3.1,  1.5,  1.5]]
 
 # Initialize target joint positions
 init_qpos = np.array([0.0, -3.14, 3.14, 0.0, -1.57, -0.157])
 target_qpos = init_qpos.copy()
-init_gpos = lerobot_FK(init_qpos[0:5])
+init_gpos = lerobot_FK(init_qpos[1:5],robot=robot)
 target_gpos = init_gpos.copy()
 
 # Thread-safe lock for key press management
@@ -114,20 +116,22 @@ motors = {"shoulder_pan": (1, "sts3215"),
           "wrist_roll": (5, "sts3215"),
           "gripper": (6, "sts3215")}
 
-follower_arm = FeetechMotorsBus(port="/dev/lerobot_tty1", motors=motors)
-follower_arm.connect()
-print('Robot arm connected successfully')
+follower_arm = feetech_arm(driver_port="/dev/lerobot_tty1", calibration_file="examples/main_follower.json" )
 
-# Load the robot arm calibration parameters
-arm_calib_path = "examples/main_follower.json" 
-with open(arm_calib_path) as f:
-    calibration = json.load(f)
-follower_arm.set_calibration(calibration)
-
+t = 0
 try:
     # Launch MuJoCo viewer
     with mujoco.viewer.launch_passive(mjmodel, mjdata) as viewer:
         start = time.time()
+        if t ==0 :
+            mjdata.qpos[qpos_indices] = init_qpos
+            mujoco.mj_step(mjmodel, mjdata)
+            with viewer.lock():
+                viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = int(mjdata.time % 2)
+            viewer.sync()
+            mjdata.qpos[qpos_indices] = init_qpos   
+            mujoco.mj_step(mjmodel, mjdata)    
+        t = t + 1
         while viewer.is_running() and time.time() - start < 1000:
             step_start = time.time()
 
@@ -160,11 +164,12 @@ try:
                                 target_gpos[position_idx] += POSITION_INSERMENT * direction
 
             print("target_gpos:", [f"{x:.3f}" for x in target_gpos])
-            fd_qpos = np.concatenate(([0.0,], mjdata.qpos[qpos_indices][1:5]))
-            qpos_inv = lerobot_IK(fd_qpos, target_gpos)
+            # fd_qpos = np.concatenate(([0.0,], mjdata.qpos[qpos_indices][1:5]))
+            fd_qpos = mjdata.qpos[qpos_indices][1:5]
+            qpos_inv, IK_success = lerobot_IK(fd_qpos, target_gpos, robot=robot)
 
             if np.all(qpos_inv != -1.0):  # Check if IK solution is valid
-                target_qpos = np.concatenate((target_qpos[0:1], qpos_inv[1:5], target_qpos[5:]))
+                target_qpos = np.concatenate((target_qpos[0:1], qpos_inv[:4], target_qpos[5:]))
                 mjdata.qpos[qpos_indices] = target_qpos
 
                 mujoco.mj_step(mjmodel, mjdata)
@@ -172,13 +177,7 @@ try:
                     viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = int(mjdata.time % 2)
                 viewer.sync()
 
-                joint_angles = np.rad2deg(target_qpos)
-                joint_angles[1] = -joint_angles[1]
-                joint_angles[0] = -joint_angles[0]
-                joint_angles[4] = -joint_angles[4]
-                follower_arm.write("Goal_Position", joint_angles)
-                position = follower_arm.read("Present_Position")
-
+                follower_arm.action(target_qpos)
                 target_gpos_last = target_gpos.copy()
             else:
                 target_gpos = target_gpos_last.copy()

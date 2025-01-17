@@ -27,7 +27,7 @@ robot = get_robot2()
 
 qlimit = [[-2.1, -3.14, -0.1, -2.0, -3.1, -0.1], 
           [2.1,   0.2,   3.14, 1.8,  3.1, 1.0]]
-glimit = [[0.120, -0.4,  0.046, -3.1, -1.5, -1.5], 
+glimit = [[0.125, -0.4,  0.046, -3.1, -1.5, -1.5], 
           [0.380,  0.4,  0.23,  3.1,  1.5,  1.5]]
 
 init_qpos = np.array([0.0, -3.14, 3.14, 0.0, -1.57, -0.157])
@@ -44,7 +44,7 @@ joyconrobotics_right = JoyconRobotics(device="right",
                                       close_y=True, 
                                       limit_dof=True, 
                                       init_gpos=init_gpos, 
-                                      dof_speed=[0.5, 0.5, 0.5, 0.5, 0.5, 0.1], 
+                                      dof_speed=[0.5, 0.5, 0.5, 0.5, 0.5, 0.3], 
                                       common_rad=False,
                                       lerobot = True)
 
@@ -62,7 +62,9 @@ try:
                 viewer.sync()
                 
             t = t + 1
-            target_pose, gripper_state_r = joyconrobotics_right.update()
+            target_pose, gripper_state_r = joyconrobotics_right.get_control()# update()
+            
+            print("target_pose:", [f"{x:.3f}" for x in target_pose])
             
             for i in range(6):
                 target_pose[i] = glimit[0][i] if target_pose[i] < glimit[0][i] else (glimit[1][i] if target_pose[i] > glimit[1][i] else target_pose[i])
@@ -74,11 +76,7 @@ try:
             pitch_r = -pitch_r 
             roll_r = roll_r - math.pi/2 # lerobo末端旋转90度
             
-            right_target_gpos_real = np.array([x_r, y_r, z_r, roll_r, pitch_r, yaw_r])
-            print("right_target_gpos:", [f"{x:.3f}" for x in right_target_gpos_real])
-            
             right_target_gpos = np.array([x_r, y_r, z_r, roll_r, pitch_r, 0.0])
-            # print("right_target_gpos:", [f"{x:.3f}" for x in right_target_gpos])
             
             qpos_inv,IK_success = lerobot_IK(mjdata.qpos[qpos_indices][1:5], right_target_gpos, robot=robot)
             

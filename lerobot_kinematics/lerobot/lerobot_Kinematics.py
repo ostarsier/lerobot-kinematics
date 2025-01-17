@@ -55,8 +55,8 @@ def get_robot():
     so100 = E1 * E2 * E3 * E4 * E5 * E6 * E7 * E8 * E9 * E10 * E11 * E12 * E13 * E14 * E15 * E17 
     
     # Set joint limits
-    so100.qlim = [[-2.2, -3.14158, -0.2, -2.0, -3.14158], 
-                [2.2, 0.2, 3.14158, 1.8, 3.14158]]
+    so100.qlim = [[-2.2, -3.14158, -0.2,     -2.0, -3.14158], 
+                  [ 2.2,  0.2,      3.14158,  1.8,  3.14158]]
     
     return so100
 
@@ -142,7 +142,7 @@ def lerobot_IK(q_now, target_pose, robot=None):
     sol = robot.ikine_LM(
             Tep=T, 
             q0=q_now,
-            ilimit=4,  # 10 iterations
+            ilimit=10,  # 10 iterations
             slimit=2,  # 1 is the limit
             tol=1e-3)  # tolerance for convergence
     

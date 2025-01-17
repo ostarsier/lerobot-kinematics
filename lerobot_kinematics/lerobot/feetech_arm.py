@@ -48,6 +48,9 @@ class feetech_arm:
     
     joint_angles = np.deg2rad(qpos_degree)
     return joint_angles
+  
+  def disconnect(self):
+    self.arm_hardware.disconnect()
 
 
 
