@@ -44,7 +44,7 @@ joyconrobotics_right = JoyconRobotics(device="right",
                                       close_y=True, 
                                       limit_dof=True, 
                                       init_gpos=init_gpos, 
-                                      dof_speed=[0.5, 0.5, 0.5, 0.5, 0.5, 0.3], 
+                                    #   dof_speed=[0.5, 0.5, 0.5, 0.5, 0.5, 0.3], 
                                       common_rad=False,
                                       lerobot = True)
 
@@ -62,7 +62,7 @@ try:
                 viewer.sync()
                 
             t = t + 1
-            target_pose, gripper_state_r = joyconrobotics_right.get_control()# update()
+            target_pose, gripper_state_r, _ = joyconrobotics_right.get_control()# update()
             
             print("target_pose:", [f"{x:.3f}" for x in target_pose])
             

@@ -43,7 +43,7 @@ joyconrobotics_right = JoyconRobotics(device="right",
                                       close_y=True, 
                                       limit_dof=True, 
                                       init_gpos=init_gpos, 
-                                      dof_speed=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5], 
+                                    #   dof_speed=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5], 
                                       common_rad=False,
                                       lerobot = True)
 
