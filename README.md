@@ -56,15 +56,7 @@ python examples/lerobot_keycon_gpos.py
 Press and hold '0' to return to position
 
 
-#### (3) Genesis IK Control
-
-Example of Gripper Posture (gpos) control based on the Genesis positive inverse kinematics library.
-
-```shell
-python examples/lerobot_genesis.py
-```
-
-#### (4) Joycon Control
+#### (3) Joycon Control
 
 This is an example of using joycon to control Lerobot in mucojo, if you want to use it, please install [joycon-robotics
 ](https://github.com/box2ai-robotics/joycon-robotics) repository first!
@@ -72,6 +64,19 @@ This is an example of using joycon to control Lerobot in mucojo, if you want to 
 ```shell
 python examples/lerobot_joycon_gpos.py
 ```
+
+<!-- #### (4) Genesis IK Control
+
+Example of Gripper Posture (gpos) control based on the Genesis positive inverse kinematics library.
+
+First, if you want try this, you need install the genesis repo:
+```shell
+pip install genesis-world
+```
+
+```shell
+python examples/lerobot_genesis.py
+``` -->
 
 If this repository was helpful to you, please give us a little star and have a great time! ⭐ ⭐ ⭐ ⭐ ⭐
 

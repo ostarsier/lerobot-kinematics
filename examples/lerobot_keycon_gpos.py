@@ -30,9 +30,10 @@ POSITION_INSERMENT = 0.0008
 # Define joint limits
 qlimit = [[-2.1, -3.14, -0.1, -2.0, -3.1, -0.1], 
           [2.1, 0.2, 3.14, 1.8, 3.1, 1.0]]
-glimit = [[0.000, -0.4, 0.046, -3.1, -1.5, -1.5], 
-          [0.430, 0.4, 0.23, 3.1, 1.5, 1.5]]
-
+# glimit = [[0.000, -0.4, 0.046, -3.1, -1.5, -1.5], 
+#           [0.430, 0.4, 0.23, 3.1, 1.5, 1.5]]
+glimit = [[0.270, -0.4,  0.046, -3.1, -1.5, -1.5], 
+          [0.430,  0.4,  0.23,  3.1,  1.5,  1.5]]
 # Initialize target joint positions
 init_qpos = np.array([0.0, -3.14, 3.14, 0.0, -1.57, -0.157])
 target_qpos = init_qpos.copy()  # Copy the initial joint positions
@@ -139,9 +140,9 @@ try:
                                 
             print("target_gpos:", [f"{x:.3f}" for x in target_gpos])
             fd_qpos = np.concatenate(([0.0,], mjdata.qpos[qpos_indices][1:5]))
-            qpos_inv = lerobot_IK(fd_qpos, target_gpos)
+            qpos_inv, success = lerobot_IK(fd_qpos, target_gpos)
             
-            if np.all(qpos_inv != -1.0):  # Check if IK solution is valid
+            if success:  # Check if IK solution is valid
                 target_qpos = np.concatenate((target_qpos[0:1], qpos_inv[1:5], target_qpos[5:]))
                 mjdata.qpos[qpos_indices] = target_qpos
 
@@ -154,7 +155,7 @@ try:
             else:
                 target_gpos = target_gpos_last.copy()  # Restore the last valid target_gpos
 
-            print()
+            # print()
             # Time management to maintain simulation timestep
             time_until_next_step = mjmodel.opt.timestep - (time.time() - step_start)
             if time_until_next_step > 0:

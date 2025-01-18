@@ -119,10 +119,9 @@ try:
             # Forward and inverse kinematics
             position = lerobot_FK(target_qpos[:5])
             print("Target qpos:", [f"{x:.3f}" for x in target_qpos])
-            qpos_inv = lerobot_IK(target_qpos[:5], position)
-            
+            qpos_inv, success = lerobot_IK(target_qpos[:5], position)
             # Use inverse kinematics solution with validation
-            if np.all(qpos_inv != -1.0):  # Check if the inverse kinematics solution is valid
+            if success:  # Check if the inverse kinematics solution is valid
                 target_qpos = np.concatenate((qpos_inv, target_qpos[5:]))
                 mjdata.qpos[qpos_indices] = target_qpos
                 
