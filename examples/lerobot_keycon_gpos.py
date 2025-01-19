@@ -145,6 +145,7 @@ try:
             if success:  # Check if IK solution is valid
                 target_qpos = np.concatenate((target_qpos[0:1], qpos_inv[1:5], target_qpos[5:]))
                 mjdata.qpos[qpos_indices] = target_qpos
+                # mjdata.ctrl[qpos_indices] = target_qpos
 
                 mujoco.mj_step(mjmodel, mjdata)
                 with viewer.lock():

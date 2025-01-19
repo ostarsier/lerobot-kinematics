@@ -124,6 +124,7 @@ try:
             if success:  # Check if the inverse kinematics solution is valid
                 target_qpos = np.concatenate((qpos_inv, target_qpos[5:]))
                 mjdata.qpos[qpos_indices] = target_qpos
+                # mjdata.ctrl[qpos_indices] = target_qpos
                 
                 # Step the simulation
                 mjdata.qpos[qpos_indices] = np.concatenate((qpos_inv, target_qpos[5:]))

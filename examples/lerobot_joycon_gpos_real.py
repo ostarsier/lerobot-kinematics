@@ -66,7 +66,7 @@ try:
                 mujoco.mj_step(mjmodel, mjdata)    
             t = t + 1
     
-            target_pose, gripper_state_r = joyconrobotics_right.get_control()
+            target_pose, gripper_state_r, _ = joyconrobotics_right.get_control()
             
             for i in range(6):
                 target_pose[i] = glimit[0][i] if target_pose[i] < glimit[0][i] else (glimit[1][i] if target_pose[i] > glimit[1][i] else target_pose[i])
@@ -89,6 +89,7 @@ try:
                 print("target_qpos:", [f"{x:.3f}" for x in target_qpos])
                 
                 mjdata.qpos[qpos_indices] = target_qpos
+                # mjdata.ctrl[qpos_indices] = target_qpos
                 
                 follower_arm.action(target_qpos)
                 

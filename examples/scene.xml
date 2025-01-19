@@ -19,6 +19,7 @@
     <texture type="2d" file="assets/table/small_meta_table_diffuse.png"/>
     <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
     <!-- <material name="table" texture="small_meta_table_diffuse"/> -->
+    <!-- <model name="so_100" file="so_100.xml"/> -->
   </asset>
 
   <worldbody>

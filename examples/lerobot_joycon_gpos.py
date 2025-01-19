@@ -83,6 +83,7 @@ try:
             if IK_success:
                 target_qpos = np.concatenate(([yaw_r,], qpos_inv[:4], [gripper_state_r,])) # 使用陀螺仪控制yaw
                 mjdata.qpos[qpos_indices] = target_qpos
+                # mjdata.ctrl[qpos_indices] = target_qpos
                 
                 mujoco.mj_step(mjmodel, mjdata)
                 with viewer.lock():
