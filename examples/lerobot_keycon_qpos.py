@@ -1,4 +1,4 @@
-# code by LinCC111 2025.1.13 Box2AI-Robotics copyright 盒桥智能 版权所有
+# code by LinCC111 Boxjod 2025.1.13 Box2AI-Robotics copyright 盒桥智能 版权所有
 
 import os
 import mujoco

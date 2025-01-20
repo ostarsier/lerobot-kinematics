@@ -1,3 +1,5 @@
+# code by Boxjod LinCC111 2025.1.13 Box2AI-Robotics copyright 盒桥智能 版权所有
+
 import os
 import mujoco
 import mujoco.viewer
