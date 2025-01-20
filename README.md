@@ -97,3 +97,7 @@ If you're interested in this, you can try using the keyboard to collect data.
 ```shell
 python examples/lerobot_joycon_gpos_real.py
 ```
+
+## C. More Information
+
+More information and discussion join the QQ group: 948755626
