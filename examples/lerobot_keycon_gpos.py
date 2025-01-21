@@ -5,7 +5,7 @@ import mujoco
 import mujoco.viewer
 import numpy as np
 import time
-from lerobot_kinematics import lerobot_IK, lerobot_FK
+from lerobot_kinematics import lerobot_IK, lerobot_FK, get_robot
 from pynput import keyboard
 import threading
 
@@ -27,17 +27,20 @@ mjdata = mujoco.MjData(mjmodel)
 JOINT_INCREMENT = 0.005  # Can be adjusted as needed
 POSITION_INSERMENT = 0.0008
 
+# create robot
+robot = get_robot('so100')
+
 # Define joint limits
-qlimit = [[-2.1, -3.14, -0.1, -2.0, -3.1, -0.1], 
-          [2.1, 0.2, 3.14, 1.8, 3.1, 1.0]]
-# glimit = [[0.000, -0.4, 0.046, -3.1, -1.5, -1.5], 
-#           [0.430, 0.4, 0.23, 3.1, 1.5, 1.5]]
-glimit = [[0.270, -0.4,  0.046, -3.1, -1.5, -1.5], 
-          [0.430,  0.4,  0.23,  3.1,  1.5,  1.5]]
+
+control_qlimit = [[-2.1, -3.1, -0.0, -1.375,  -1.57, -0.15], 
+                  [ 2.1,  0.0,  3.1,  1.475,   3.1,  1.5]]
+control_glimit = [[0.125, -0.4,  0.046, -3.1, -0.75, -1.5], 
+                  [0.340,  0.4,  0.23, 2.0,  1.57,  1.5]]
+
 # Initialize target joint positions
 init_qpos = np.array([0.0, -3.14, 3.14, 0.0, -1.57, -0.157])
 target_qpos = init_qpos.copy()  # Copy the initial joint positions
-init_gpos = lerobot_FK(init_qpos[0:5])
+init_gpos = lerobot_FK(init_qpos[1:5], robot=robot)
 target_gpos = init_gpos.copy()
 
 # Thread-safe lock
@@ -48,8 +51,8 @@ key_to_joint_increase = {
     'w': 0,  # Move forward
     'a': 1,  # Move right
     'r': 2,  # Move up
-    'e': 3,  # Roll +
-    't': 4,  # Pitch +
+    'q': 3,  # Roll +
+    'g': 4,  # Pitch +
     'z': 5,  # Gripper +
 }
 
@@ -57,8 +60,8 @@ key_to_joint_decrease = {
     's': 0,  # Move backward
     'd': 1,  # Move left
     'f': 2,  # Move down
-    'q': 3,  # Roll -
-    'g': 4,  # Pitch -
+    'e': 3,  # Roll -
+    't': 4,  # Pitch -
     'c': 5,  # Gripper -
 }
 
@@ -101,6 +104,7 @@ listener.start()
 
 # Backup for target_gpos in case of invalid IK
 target_gpos_last = init_gpos.copy()
+target_qpos_last = init_qpos.copy()
 
 try:
     # Launch the MuJoCo viewer
@@ -116,47 +120,49 @@ try:
                         position_idx = key_to_joint_increase[k]
                         if position_idx == 1 or position_idx == 5:  # Special handling for joint 1 and 5
                             position_idx = 0 if position_idx == 1 else 5
-                            if (target_qpos[position_idx]) < qlimit[1][position_idx] - JOINT_INCREMENT * direction:
+                            if (target_qpos[position_idx]) < control_qlimit[1][position_idx] - JOINT_INCREMENT * direction:
                                 target_qpos[position_idx] += JOINT_INCREMENT * direction
                         elif position_idx == 4 or position_idx == 3:
-                            if target_gpos[position_idx] <= glimit[1][position_idx]:
+                            if target_gpos[position_idx] <= control_glimit[1][position_idx]:
                                 target_gpos[position_idx] += POSITION_INSERMENT * direction * 4
                         else:
-                            if target_gpos[position_idx] <= glimit[1][position_idx]:
+                            if target_gpos[position_idx] <= control_glimit[1][position_idx]:
                                 target_gpos[position_idx] += POSITION_INSERMENT * direction
                         
                     elif k in key_to_joint_decrease:
                         position_idx = key_to_joint_decrease[k]
                         if position_idx == 1 or position_idx == 5:
                             position_idx = 0 if position_idx == 1 else 5
-                            if (target_qpos[position_idx]) > qlimit[0][position_idx] - JOINT_INCREMENT * direction:
+                            if (target_qpos[position_idx]) > control_qlimit[0][position_idx] - JOINT_INCREMENT * direction:
                                 target_qpos[position_idx] += JOINT_INCREMENT * direction
                         elif position_idx == 4 or position_idx == 3:
-                            if target_gpos[position_idx] <= glimit[1][position_idx]:
+                            if target_gpos[position_idx] >= control_glimit[0][position_idx]:
                                 target_gpos[position_idx] += POSITION_INSERMENT * direction * 4
                         else:
-                            if target_gpos[position_idx] >= glimit[0][position_idx]:
+                            if target_gpos[position_idx] >= control_glimit[0][position_idx]:
                                 target_gpos[position_idx] += POSITION_INSERMENT * direction
                                 
             print("target_gpos:", [f"{x:.3f}" for x in target_gpos])
-            fd_qpos = np.concatenate(([0.0,], mjdata.qpos[qpos_indices][1:5]))
-            qpos_inv, success = lerobot_IK(fd_qpos, target_gpos)
+            fd_qpos = mjdata.qpos[qpos_indices][1:5]
+            qpos_inv, ik_success = lerobot_IK(fd_qpos, target_gpos, robot=robot)
             
-            if success:  # Check if IK solution is valid
-                target_qpos = np.concatenate((target_qpos[0:1], qpos_inv[1:5], target_qpos[5:]))
-                mjdata.qpos[qpos_indices] = target_qpos
+            if ik_success:  # Check if IK solution is valid
+                # target_qpos = np.concatenate((target_qpos[0:1], qpos_inv[1:5], target_qpos[5:]))
+                target_qpos = np.concatenate((target_qpos[0:1], qpos_inv[:4], target_qpos[5:]))
                 # mjdata.ctrl[qpos_indices] = target_qpos
+                mjdata.qpos[qpos_indices] = target_qpos
 
                 mujoco.mj_step(mjmodel, mjdata)
                 with viewer.lock():
                     viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = int(mjdata.time % 2)
                 viewer.sync()
-
+                
+                # backup
                 target_gpos_last = target_gpos.copy()  # Save backup of target_gpos
+                target_qpos_last = target_qpos.copy()  # Save backup of target_gpos
             else:
                 target_gpos = target_gpos_last.copy()  # Restore the last valid target_gpos
 
-            # print()
             # Time management to maintain simulation timestep
             time_until_next_step = mjmodel.opt.timestep - (time.time() - step_start)
             if time_until_next_step > 0:
@@ -166,3 +172,4 @@ except KeyboardInterrupt:
     print("User interrupted the simulation.")
 finally:
     listener.stop()  # Stop the keyboard listener
+    viewer.close()

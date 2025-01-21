@@ -5,7 +5,6 @@ scipy
 ansitable
 progress
 typing_extensions
-mujoco==3.2.5
 
 [dev]
 sympy

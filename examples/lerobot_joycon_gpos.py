@@ -8,7 +8,7 @@ import time
 import threading
 
 # for joycon
-from lerobot_kinematics import lerobot_IK, lerobot_FK, get_robot2
+from lerobot_kinematics import lerobot_IK, lerobot_FK, get_robot
 from joyconrobotics import JoyconRobotics
 import math
 
@@ -25,12 +25,10 @@ mjdata = mujoco.MjData(mjmodel)
 JOINT_INCREMENT = 0.01  
 POSITION_INSERMENT = 0.002
 
-robot = get_robot2()
+robot = get_robot('so100')
 
-qlimit = [[-2.1, -3.14, -0.1, -2.0, -3.1, -0.1], 
-          [2.1,   0.2,   3.14, 1.8,  3.1, 1.0]]
-glimit = [[0.125, -0.4,  0.046, -3.1, -1.5, -1.5], 
-          [0.380,  0.4,  0.23,  3.1,  1.5,  1.5]]
+control_glimit = [[0.125, -0.4,  0.046, -3.1, -1.5, -1.5], 
+                  [0.380,  0.4,  0.23,  3.1,  1.5,  1.5]]
 
 init_qpos = np.array([0.0, -3.14, 3.14, 0.0, -1.57, -0.157])
 target_qpos = init_qpos.copy() 
@@ -45,10 +43,12 @@ joyconrobotics_right = JoyconRobotics(device="right",
                                       horizontal_stick_mode='yaw_diff', 
                                       close_y=True, 
                                       limit_dof=True, 
+                                      glimit = control_glimit,
                                       init_gpos=init_gpos, 
                                     #   dof_speed=[0.5, 0.5, 0.5, 0.5, 0.5, 0.3], 
                                       common_rad=False,
-                                      lerobot = True)
+                                      lerobot = True,
+                                      pitch_down_double=True)
 
 t = 0
 try:
@@ -69,7 +69,7 @@ try:
             print("target_pose:", [f"{x:.3f}" for x in target_pose])
             
             for i in range(6):
-                target_pose[i] = glimit[0][i] if target_pose[i] < glimit[0][i] else (glimit[1][i] if target_pose[i] > glimit[1][i] else target_pose[i])
+                target_pose[i] = control_glimit[0][i] if target_pose[i] < control_glimit[0][i] else (control_glimit[1][i] if target_pose[i] > control_glimit[1][i] else target_pose[i])
     
             x_r = target_pose[0] # init_gpos[0] + 
             z_r = target_pose[2] # init_gpos[2] + 
@@ -102,4 +102,4 @@ try:
                 time.sleep(time_until_next_step)
             time.sleep(0.001)
 except KeyboardInterrupt:
-    print("用户中断了模拟。")
+    viewer.close()

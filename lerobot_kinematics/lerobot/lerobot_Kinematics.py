@@ -23,44 +23,7 @@ def acos(value):
 def round_value(value):
     return round(value, 3)
 
-def get_robot():
-    # to joint 1
-    E1 = ET.tx(0.0612)
-    E2 = ET.tz(0.0598)
-    E3 = ET.Rz()
-    
-    # to joint 2
-    E4 = ET.tx(0.02943)
-    E5 = ET.tz(0.05504)
-    E6 = ET.Ry()
-    
-    # to joint 3
-    E7 = ET.tx(0.1127)
-    E8 = ET.tz(-0.02798)
-    E9 = ET.Ry()
-
-    # to joint 4
-    E10 = ET.tx(0.13504)
-    E11 = ET.tz(0.00519)
-    E12 = ET.Ry()
-    
-    # to joint 5
-    E13 = ET.tx(0.0593)
-    E14 = ET.tz(0.00996)
-    E15 = ET.Rx()  
-    
-    E17 = ET.tx(0.09538)
-    # to gripper
-    
-    so100 = E1 * E2 * E3 * E4 * E5 * E6 * E7 * E8 * E9 * E10 * E11 * E12 * E13 * E14 * E15 * E17 
-    
-    # Set joint limits
-    so100.qlim = [[-2.2, -3.14158, -0.2,     -2.0, -3.14158], 
-                  [ 2.2,  0.2,      3.14158,  1.8,  3.14158]]
-    
-    return so100
-
-def get_robot2():
+def create_so100():
     # to joint 1
     # E1 = ET.tx(0.0612)
     # E2 = ET.tz(0.0598)
@@ -89,21 +52,25 @@ def get_robot2():
     # E17 = ET.tx(0.09538)
     # to gripper
     
-    so1002 = E4 * E5 * E6 * E7 * E8 * E9 * E10 * E11 * E12 * E13 * E14 * E15 #* E17  # E1 * E2 * E3 * 
+    so100 = E4 * E5 * E6 * E7 * E8 * E9 * E10 * E11 * E12 * E13 * E14 * E15 #* E17  # E1 * E2 * E3 * 
     
     # Set joint limits
-    so1002.qlim = [[-3.14158, -0.2, -2.0, -3.14158], 
-                [0.2, 3.14158, 1.8, 3.14158]]
+    so100.qlim = [[-3.14158, -0.2,     -1.5, -3.14158], 
+                  [ 0.2,      3.14158,  1.5,  3.14158]]
     
-    return so1002
+    return so100
 
-# PI = math.pi
-# so100 = get_robot()
+def get_robot(robot="so100"):
+    
+    if robot == "so100":
+        return create_so100()
+    else:
+        print(f"Sorry, we don't support {robot} robot now")
+        return None
 
-def lerobot_FK(qpos_data, robot=None):
-    if robot == None:
-        robot = get_robot()
-        
+def lerobot_FK(qpos_data, robot):
+    if len(qpos_data) != len(robot.qlim[0]):
+        raise Exception("The dimensions of qpose_data are not the same as the robot joint dimensions")
     # Get the end effector's homogeneous transformation matrix (T is an SE3 object)
     T = robot.fkine(qpos_data)
     
@@ -112,7 +79,7 @@ def lerobot_FK(qpos_data, robot=None):
     
     # Extract rotation matrix (T.A) and calculate Euler angles (alpha, beta, gamma)
     R = T.R  # Get the rotation part (3x3 matrix)
-    
+
     # Calculate Euler angles
     beta = atan2(-R[2, 0], sqrt(R[0, 0]**2 + R[1, 0]**2))
     
@@ -125,10 +92,9 @@ def lerobot_FK(qpos_data, robot=None):
     
     return np.array([X, Y, Z, gamma, beta, alpha])
     
-def lerobot_IK(q_now, target_pose, robot=None):
-    
-    if robot == None:
-        robot = get_robot()
+def lerobot_IK(q_now, target_pose, robot):
+    if len(q_now) != len(robot.qlim[0]):
+        raise Exception("The dimensions of qpose_data are not the same as the robot joint dimensions")
     # R = SE3.RPY(target_pose[3:])
     # T = SE3(target_pose[:3]) * R
     
@@ -150,6 +116,7 @@ def lerobot_IK(q_now, target_pose, robot=None):
         # If IK solution is successful, 
         q = sol.q
         q = smooth_joint_motion(q_now, q, robot)
+        # print(f'{q=}')
         return q, True
     else:
         # If the target position is unreachable, IK fails

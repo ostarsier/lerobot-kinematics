@@ -6,7 +6,7 @@ import mujoco.viewer
 import numpy as np
 import time
 
-from lerobot_kinematics import lerobot_IK, lerobot_FK
+from lerobot_kinematics import lerobot_IK, lerobot_FK, get_robot
 from pynput import keyboard
 import threading
 
@@ -27,14 +27,17 @@ mjdata = mujoco.MjData(mjmodel)
 # Define joint control increment (in radians)
 JOINT_INCREMENT = 0.01  # Can be adjusted as needed
 
+# create robot
+robot = get_robot('so100')
+
 # Define joint limits
-qlimit = [[-2.1, -3.0, -0.1, -2.0, -3.0, -0.1], 
-          [2.1, 0.2, 3.0, 1.8, 3.0, 1]]
+control_qlimit = [[-2.1, -3.1, -0.0, -1.4,    -1.57, -0.15], 
+                  [ 2.1,  0.0,  3.1,  1.475,   3.1,  1.5]]
 
 # Initialize target joint positions
-init_qpos = np.array([0, -3.14, 3.14, 0, 0, -0.157])
+init_qpos = np.array([0.0, -3.14, 3.14, 0.0, -1.57, -0.157])
 target_qpos = init_qpos.copy()  # Copy of initial joint positions
-init_pose = lerobot_FK(np.zeros(6))  # Initial pose from FK
+init_gpos = lerobot_FK(init_qpos[1:5], robot=robot)
 
 # Thread-safe lock
 lock = threading.Lock()
@@ -108,37 +111,32 @@ try:
                 for k, direction in keys_pressed.items():
                     if k in key_to_joint_increase:
                         joint_idx = key_to_joint_increase[k]
-                        if target_qpos[joint_idx] < qlimit[1][joint_idx]:
+                        if target_qpos[joint_idx] < control_qlimit[1][joint_idx]:
                             target_qpos[joint_idx] += JOINT_INCREMENT * direction
                         
                     elif k in key_to_joint_decrease:
                         joint_idx = key_to_joint_decrease[k]
-                        if target_qpos[joint_idx] > qlimit[0][joint_idx]:
+                        if target_qpos[joint_idx] > control_qlimit[0][joint_idx]:
                             target_qpos[joint_idx] += JOINT_INCREMENT * direction  # direction is -1
 
             # Forward and inverse kinematics
-            position = lerobot_FK(target_qpos[:5])
+            position = lerobot_FK(target_qpos[1:5], robot=robot)
             print("Target qpos:", [f"{x:.3f}" for x in target_qpos])
-            qpos_inv, success = lerobot_IK(target_qpos[:5], position)
+            
+            qpos_inv, ik_success = lerobot_IK(target_qpos[1:5], position, robot=robot)
             # Use inverse kinematics solution with validation
-            if success:  # Check if the inverse kinematics solution is valid
-                target_qpos = np.concatenate((qpos_inv, target_qpos[5:]))
-                mjdata.qpos[qpos_indices] = target_qpos
-                # mjdata.ctrl[qpos_indices] = target_qpos
-                
+            if ik_success:  # Check if the inverse kinematics solution is valid
+                target_qpos = np.concatenate((target_qpos[0:1], qpos_inv[:4], target_qpos[5:]))
+
                 # Step the simulation
-                mjdata.qpos[qpos_indices] = np.concatenate((qpos_inv, target_qpos[5:]))
+                # mjdata.ctrl[qpos_indices] = target_qpos
+                mjdata.qpos[qpos_indices] = target_qpos
                 mujoco.mj_step(mjmodel, mjdata)
 
                 # Update viewer options (e.g., toggle contact point display every second)
                 with viewer.lock():
                     viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = int(mjdata.time % 2)
-
-                # Sync the viewer
                 viewer.sync()
-                position = lerobot_FK(mjdata.qpos[qpos_indices][:5])  # Get FK of the updated qpos
-                print("Current qpos:", [f"{x:.3f}" for x in mjdata.qpos[qpos_indices]])
-                print()
                 
                 target_gpos_last = target_qpos.copy()  # Backup the valid target_qpos
             else:
@@ -153,3 +151,4 @@ except KeyboardInterrupt:
     print("User interrupted the simulation.")
 finally:
     listener.stop()  # Stop the keyboard listener
+    viewer.close()

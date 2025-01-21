@@ -2,6 +2,7 @@
 
 import numpy as np
 
+# If you install genesis it may break the lerobot python environment.
 import genesis as gs
 gs.init(backend=gs.gpu)
 

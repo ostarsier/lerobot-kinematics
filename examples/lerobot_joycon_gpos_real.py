@@ -8,7 +8,7 @@ import time
 import threading
 
 # for joycon
-from lerobot_kinematics import lerobot_IK, lerobot_FK, get_robot2, feetech_arm
+from lerobot_kinematics import lerobot_IK, lerobot_FK, get_robot, feetech_arm
 from joyconrobotics import JoyconRobotics
 import math
 
@@ -22,14 +22,13 @@ mjmodel = mujoco.MjModel.from_xml_path(xml_path)
 qpos_indices = np.array([mjmodel.jnt_qposadr[mjmodel.joint(name).id] for name in JOINT_NAMES])
 mjdata = mujoco.MjData(mjmodel)
 
-robot = get_robot2()
+robot = get_robot("so100")
 
-qlimit = [[-2.1, -3.14, -0.1, -2.0, -3.1, -0.1], 
-          [2.1,   0.2,   3.14, 1.8,  3.1, 1.0]]
-glimit = [[0.125, -0.4,  0.046, -1.5, -1.57, -1.5], 
-          [0.380,  0.4,  0.23,  3.1,  1.57,  1.5]]
+control_glimit = [[0.125, -0.4,  0.046, -3.1, -1.5, -1.5], 
+                  [0.380,  0.4,  0.23,  3.1,  1.5,  1.5]]
 
 init_qpos = np.array([0.0, -3.14, 3.14, 0.0, -1.57, -0.157])
+# init_qpos = np.array([0.0, -3.14, 3.14, 0.0, -1.57, -0.157])
 target_qpos = init_qpos.copy() 
 init_gpos = lerobot_FK(init_qpos[1:5], robot=robot)
 
@@ -44,10 +43,12 @@ joyconrobotics_right = JoyconRobotics(device="right",
                                       horizontal_stick_mode='yaw_diff', 
                                       close_y=True, 
                                       limit_dof=True, 
+                                      glimit=control_glimit,
                                       init_gpos=init_gpos, 
                                     #   dof_speed=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5], 
                                       common_rad=False,
-                                      lerobot = True)
+                                      lerobot = True,
+                                      pitch_down_double=True)
 
 follower_arm = feetech_arm(driver_port="/dev/lerobot_tty1", calibration_file="examples/main_follower.json" )
 
@@ -71,7 +72,7 @@ try:
             target_pose, gripper_state_r, _ = joyconrobotics_right.get_control()
             
             for i in range(6):
-                target_pose[i] = glimit[0][i] if target_pose[i] < glimit[0][i] else (glimit[1][i] if target_pose[i] > glimit[1][i] else target_pose[i])
+                target_pose[i] = control_glimit[0][i] if target_pose[i] < control_glimit[0][i] else (control_glimit[1][i] if target_pose[i] > control_glimit[1][i] else target_pose[i])
     
             x_r = target_pose[0] # init_gpos[0] + 
             z_r = target_pose[2] # init_gpos[2] + 
@@ -79,16 +80,16 @@ try:
             y_r = 0.01
             pitch_r = -pitch_r 
             roll_r = roll_r - math.pi/2 # lerobo末端旋转90度
-
+    
             right_target_gpos = np.array([x_r, y_r, z_r, roll_r, pitch_r, 0.0])
             fd_qpos_mucojo = mjdata.qpos[qpos_indices][1:5]
-
+            print("right_target_gpos:", [f"{x:.3f}" for x in right_target_gpos])
             qpos_inv_mujoco, IK_success = lerobot_IK(fd_qpos_mucojo, right_target_gpos, robot=robot)
             
             if IK_success:
                 target_qpos = np.concatenate(([yaw_r,], qpos_inv_mujoco[:4], [gripper_state_r,])) # 使用陀螺仪控制yaw
 
-                print("target_qpos:", [f"{x:.3f}" for x in target_qpos])
+                # print("target_qpos:", [f"{x:.3f}" for x in target_qpos])
                 
                 mjdata.qpos[qpos_indices] = target_qpos
                 # mjdata.ctrl[qpos_indices] = target_qpos
@@ -110,5 +111,6 @@ try:
                 time.sleep(time_until_next_step)
             time.sleep(0.01)
 except KeyboardInterrupt:
-    print("用户中断了模拟。")
+    print("User stop the program.")
     follower_arm.disconnect()
+    viewer.close()
