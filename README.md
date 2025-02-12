@@ -5,11 +5,15 @@
 
 This repository is a fork of the following projects [Robotics Toolbox for Python](https://github.com/petercorke/robotics-toolbox-python).
 
-## A. Installation (Ubuntu 20.04)
+## A. Installation
 
-We recommend **python=3.10** for consistency with lerobot.
+We recommend using conda for **python=3.10** installations to be consistent with [lerobot](https://github.com/huggingface/lerobot).
 
 ```bash
+  # if no lerobot conda env
+  # conda create -y -n lerobot python=3.10
+  # conda activate lerobot
+
   git clone https://github.com/box2ai-robotics/lerobot-kinematics.git
   cd lerobot-kinematics
   pip install -e .
@@ -20,7 +24,7 @@ We recommend **python=3.10** for consistency with lerobot.
 We recommended to click on the terminal window with the mouse after startup and then enter the keys, to avoid that the keys in the departure [mujoco](https://github.com/google-deepmind/mujoco) change the configuration of the scene.
 
 ```shell
-pip install mujoco==3.2.5
+pip install mujoco # Recommend 3.2.5
 ```
 
 #### (1) qpos control

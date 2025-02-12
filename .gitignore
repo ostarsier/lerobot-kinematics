@@ -4,5 +4,5 @@
 
 examples/main_follower.json
 .vscode/settings.json
-lerobot_kinematics/lerobot/__pycache__/lerobot_Kinematics.cpython-310.pyc
-lerobot_kinematics.egg-info//**
+lerobot_kinematics/lerobot/__pycache__/**
+lerobot_kinematics.egg-info/**

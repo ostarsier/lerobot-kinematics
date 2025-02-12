@@ -18,6 +18,7 @@ dependencies = [
     "ansitable",
     "progress",
     "typing_extensions",
+    "tqdm"
 ]
 
 license = { file = "LICENSE" }
