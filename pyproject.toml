@@ -18,7 +18,8 @@ dependencies = [
     "ansitable",
     "progress",
     "typing_extensions",
-    "tqdm"
+    "tqdm",
+    "feetech-servo-sdk"
 ]
 
 license = { file = "LICENSE" }
