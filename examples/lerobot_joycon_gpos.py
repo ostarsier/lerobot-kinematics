@@ -39,13 +39,14 @@ lock = threading.Lock()
 target_gpos_last = init_gpos.copy()
 direction_data_r = [[], [], []]  
 
+offset_position_m = init_gpos[0:3]
 joyconrobotics_right = JoyconRobotics(device="right", 
                                       horizontal_stick_mode='yaw_diff', 
                                       close_y=True, 
                                       limit_dof=True, 
                                       glimit = control_glimit,
-                                      init_gpos=init_gpos, 
-                                    #   dof_speed=[0.5, 0.5, 0.5, 0.5, 0.5, 0.3], 
+                                      offset_position_m=offset_position_m, 
+                                    #   offset_euler_rad = offset_euler_rad,
                                       common_rad=False,
                                       lerobot = True,
                                       pitch_down_double=True)
