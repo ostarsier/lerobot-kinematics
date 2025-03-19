@@ -88,9 +88,8 @@ If this repository was helpful to you, please give us a little star and have a g
 
 ## C. Examples in Real
 
-```shell
-python examples/lerobot_keycon_gpos_real.py
-```
+**NOTE:** Before using the robotic arm, you must first bind and calibrate the robotic arm ports using the [lerobot-joycon](https://github.com/box2ai-robotics/lerobot-joycon) repository. After completing the calibration, copy the resulting calibration file to the `/examples` directory. For example, you can find the calibration file at `lerobot-joycon/.cache/calibration/so100/main_follower.json`.
+
 
 #### (1) Keyboard Control in Real
 
