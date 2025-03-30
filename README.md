@@ -23,9 +23,6 @@ We recommend using conda for **python=3.10** installations to be consistent with
 
 We recommended to click on the terminal window with the mouse after startup and then enter the keys, to avoid that the keys in the departure [mujoco](https://github.com/google-deepmind/mujoco) change the configuration of the scene.
 
-```shell
-pip install mujoco # Recommend 3.2.5
-```
 
 #### (1) qpos control
 
@@ -41,6 +38,13 @@ python examples/lerobot_keycon_qpos.py
 
 Press and hold '0' to return to position
 
+If you encounter error "GLFWError: (65543) b'GLX: Failed to create context: BadValue (integer paraneter out of range for operation)'
+warnings.warn(nessage,GLFWError) the Mu ERROR: could not create window" and are using ubuntu 21.04, it may be because your computer is using integrated graphics by default and does not support mujoco visualization, please run the following command to switch to discrete graphics.
+
+```shell
+sudo prime-select nvidia
+sudo reboot
+```
 
 #### (2) gpos Control
 

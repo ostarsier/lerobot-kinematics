@@ -20,7 +20,8 @@ dependencies = [
     "progress",
     "typing_extensions",
     "tqdm",
-    "feetech-servo-sdk"
+    "feetech-servo-sdk",
+    "mujoco==3.2.5"
 ]
 
 license = { file = "LICENSE" }
