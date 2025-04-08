@@ -50,7 +50,7 @@ joyconrobotics_right = JoyconRobotics(device="right",
                                       lerobot = True,
                                       pitch_down_double=True)
 
-follower_arm = feetech_arm(driver_port="/dev/lerobot_tty1", calibration_file="examples/main_follower.json" )
+follower_arm = feetech_arm(driver_port="/dev/lerobot_right", calibration_file="examples/main_follower.json" )
 
 t = 0
 try:

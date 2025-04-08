@@ -115,7 +115,7 @@ motors = {"shoulder_pan": (1, "sts3215"),
           "wrist_roll": (5, "sts3215"),
           "gripper": (6, "sts3215")}
 
-follower_arm = feetech_arm(driver_port="/dev/lerobot_tty1", calibration_file="examples/main_follower.json" )
+follower_arm = feetech_arm(driver_port="/dev/lerobot_right", calibration_file="examples/main_follower.json" )
 
 t = 0
 try:

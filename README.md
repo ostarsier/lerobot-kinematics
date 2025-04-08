@@ -111,6 +111,7 @@ If you're interested in this, you can try using the keyboard to collect data.
 python examples/lerobot_joycon_gpos_real.py
 ```
 
-## C. More Information
-
-More information and discussion join the QQ group: 948755626
+## C. More Info
+1. You can follow the [bilibili video account](https://space.bilibili.com/122291348)
+2. Join the discussion on the QQ group: 948755626
+3. [Click here](https://item.taobao.com/item.htm?abbucket=16&detail_redpacket_pop=true&id=906794552661&ltk2=17440907659690jpsj3h7uiismft7vle37&ns=1&skuId=5933796995638) to buy the well-tuned version of the hardware.
