@@ -96,7 +96,7 @@ try:
                 target_gpos_last = right_target_gpos.copy() 
             else:
                 right_target_gpos = target_gpos_last.copy()
-                joyconrobotics_right.set_position = right_target_gpos[0:3]
+                joyconrobotics_right.set_position(right_target_gpos[0:3])
             
             time_until_next_step = mjmodel.opt.timestep - (time.time() - step_start)
             if time_until_next_step > 0:
