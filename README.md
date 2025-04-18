@@ -88,8 +88,6 @@ pip install genesis-world
 python examples/lerobot_genesis.py
 ``` -->
 
-If this repository was helpful to you, please give us a little star and have a great time! ⭐ ⭐ ⭐ ⭐ ⭐
-
 ## C. Examples in Real
 
 **NOTE:** Before using the robotic arm, you must first bind and calibrate the robotic arm ports using the [lerobot-joycon](https://github.com/box2ai-robotics/lerobot-joycon) repository. After completing the calibration, copy the resulting calibration file to the `/examples` directory. For example, you can find the calibration file at `lerobot-joycon/.cache/calibration/so100/main_follower.json`.
@@ -115,3 +113,5 @@ python examples/lerobot_joycon_gpos_real.py
 1. You can follow the [bilibili video account](https://space.bilibili.com/122291348)
 2. Join the discussion on the QQ group: 948755626
 3. [Click here](https://item.taobao.com/item.htm?abbucket=16&detail_redpacket_pop=true&id=906794552661&ltk2=17440907659690jpsj3h7uiismft7vle37&ns=1&skuId=5933796995638) to buy the well-tuned version of the hardware.
+
+If this repository was helpful to you, please give us a little star and have a great time! ⭐ ⭐ ⭐ ⭐ ⭐
