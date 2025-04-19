@@ -1,9 +1,21 @@
 
 # LeRobot-Kinematics: Simple and Accurate Forward and Inverse Kinematics Examples for the Lerobot SO100 ARM
 
+<p align="center">
+  <a href="README.md">English</a> •
+  <a href="README_zh.md">中文</a> 
+</p>
+
 ## Declaration
 
-This repository is a fork of the following projects [Robotics Toolbox for Python](https://github.com/petercorke/robotics-toolbox-python).
+This project is developed with great respect and reference to the following open-source projects, which have significantly influenced its core design and implementation:
+
+ - [Robotics Toolbox for Python](https://github.com/petercorke/robotics-toolbox-python)
+ - [huggingface/lerobot](https://github.com/huggingface/lerobot)
+ - [TheRobotStudio/SO-ARM100](https://github.com/TheRobotStudio/SO-ARM100)
+ - [google-deepmind/mujoco](https://github.com/google-deepmind/mujoco)
+
+We sincerely appreciate the contributions of these projects to the robotics community.
 
 ## A. Installation
 
@@ -11,8 +23,8 @@ We recommend using conda for **python=3.10** installations to be consistent with
 
 ```bash
   # if no lerobot conda env
-  conda create -y -n lerobot1 python=3.10
-  conda activate lerobot1
+  conda create -y -n lerobot python=3.10
+  conda activate lerobot
 
   git clone https://github.com/box2ai-robotics/lerobot-kinematics.git
   cd lerobot-kinematics
@@ -110,8 +122,7 @@ python examples/lerobot_joycon_gpos_real.py
 ```
 
 ## C. More Info
-1. You can follow the [bilibili video account](https://space.bilibili.com/122291348)
+1. You can follow the [bilibili video account - Box2AI](https://space.bilibili.com/122291348)
 2. Join the discussion on the QQ group: 948755626
-3. [Click here](https://item.taobao.com/item.htm?abbucket=16&detail_redpacket_pop=true&id=906794552661&ltk2=17440907659690jpsj3h7uiismft7vle37&ns=1&skuId=5933796995638) to buy the well-tuned version of the hardware.
 
 If this repository was helpful to you, please give us a little star and have a great time! ⭐ ⭐ ⭐ ⭐ ⭐
