@@ -1,0 +1,143 @@
+<mujoco model="xyber_x1_right_arm">
+  <compiler angle='radian' eulerseq="XYZ" meshdir="../meshes"
+    autolimits="true" />
+
+  <option timestep="0.001" />
+
+  <visual>
+    <global azimuth="150" elevation="-20" />
+    <headlight ambient="0.3 0.3 0.3" diffuse="0.6 0.6 0.6" specular="0 0 0" />
+    <scale forcewidth="0.03" contactwidth="0.01" contactheight="0.02" com="1" framelength="0.6"
+      framewidth="0.05" />
+    <rgba haze="0.15 0.25 0.35 1" com="0.502 1 0 0.5" contactpoint="1 1 0.6 0.4"
+      contactforce="0.98 0.4 0.4 1" />
+  </visual>
+  
+  <default>
+    <geom contype="0" conaffinity="0" solref="0.005 1" condim="3" friction="1 1" />
+    <equality solref="0.005 1" />
+    <default class="collision">
+      <geom contype="1" group="3" type="capsule" />
+      <default class="collision-right">
+        <geom contype="4" conaffinity="2" />
+      </default>
+    </default>
+    <default class="arm_joint">
+      <joint type="hinge" damping="1" range="-3.14 3.14" />
+    </default>
+  </default>
+  
+  <asset>
+    <!-- 只保留右臂相关的mesh -->
+    <mesh name="right_shoulder_pitch" file="right_shoulder_pitch.STL" />
+    <mesh name="right_shoulder_roll" file="right_shoulder_roll.STL" />
+    <mesh name="right_shoulder_yaw" file="right_shoulder_yaw.STL" />
+    <mesh name="right_elbow_pitch" file="right_elbow_pitch.STL" />
+    <mesh name="right_elbow_yaw" file="right_elbow_yaw.STL" />
+    <mesh name="right_wrist_pitch" file="right_wrist_pitch.STL" />
+    <mesh name="right_wrist_roll" file="right_wrist_roll.STL" />
+    
+    <!-- 添加材质 -->
+    <material name="orange" rgba="1.0 0.331 0.0 1.0" specular="0.1" shininess="0.1"/>
+    <material name="black" rgba="0.1 0.1 0.1 1.0" specular="0.1" shininess="0.1"/>
+    <material name="red" rgba="1.0 0.4 0.4 1.0" />
+    <material name="yellow" rgba="1.0 1.0 0.4 1.0" />
+    <material name="green" rgba="0.4 1.0 0.4 1.0" />
+    <material name="blue" rgba="0.0 0.5 1.0 1.0" />
+    <material name="purple" rgba="1.0 0.5 1.0 1.0" />
+  </asset>
+  
+  <worldbody>
+    <!-- 添加地面 -->
+    <geom name="floor" pos="0 0 0" size="5 5 0.1" type="plane" material="orange" />
+    
+    <!-- 右臂基座 -->
+    <body name="right_arm_base" pos="0 0 0.1">
+      <inertial pos="0 0 0" mass="1.0" diaginertia="0.1 0.1 0.1"/>
+      <geom type="cylinder" size="0.05 0.05" rgba="0.2 0.2 0.2 1" />
+      
+      <!-- 右肩关节 -->
+      <body name="right_shoulder_pitch_link" pos="0 0 0.05">
+        <inertial pos="0.00250704 -0.00149173 -0.0567433" quat="0.995977 -0.00568417 0.0346063 -0.0824611" mass="1.00679" diaginertia="0.00108562 0.000958168 0.000853396"/>
+        <joint name="right_shoulder_pitch" class="arm_joint" axis="0 1 0" />
+        <geom type="mesh" mesh="right_shoulder_pitch" material="red" />
+        
+        <body name="right_shoulder_roll_link" pos="0.0313 0 -0.0592" quat="-2.59734e-06 0.707105 2.59735e-06 0.707108">
+          <inertial pos="9.998e-05 -0.0778724 -0.0270563" quat="0.64355 0.765355 0.0062383 -0.00599871" mass="0.691426" diaginertia="0.00133761 0.00119704 0.000636294"/>
+          <joint name="right_shoulder_roll" class="arm_joint" axis="1 0 0" />
+          <geom type="mesh" mesh="right_shoulder_roll" material="yellow" />
+          
+          <body name="right_shoulder_yaw_link" pos="0 -0.1252 -0.0313" quat="0.707105 0.707108 0 0">
+            <inertial pos="-0.00189082 -0.00017102 0.0317511" quat="0.694675 -0.204745 -0.19648 0.660985" mass="0.604503" diaginertia="0.000550567 0.000505158 0.000491905"/>
+            <joint name="right_shoulder_yaw" class="arm_joint" axis="0 0 1" />
+            <geom type="mesh" mesh="right_shoulder_yaw" material="green" />
+            
+            <body name="right_elbow_pitch_link" pos="-0.031 0 0.0365" quat="0.5 -0.5 0.5 -0.5">
+              <inertial pos="-2.604e-05 -0.0752983 0.0268563" quat="0.802034 0.597278 0.000362597 -2.24278e-05" mass="0.697801" diaginertia="0.00116302 0.00100116 0.000614171"/>
+              <joint name="right_elbow_pitch" class="arm_joint" axis="0 0 1" />
+              <geom type="mesh" mesh="right_elbow_pitch" material="blue" />
+              
+              <body name="right_elbow_yaw_link" pos="0 -0.117 0.031" quat="0.499999 -0.499999 -0.500001 -0.500001">
+                <inertial pos="-0.00403154 -0.00910945 -0.047197" quat="0.994559 0.0793425 -0.0232128 -0.0633939" mass="0.573838" diaginertia="0.00105729 0.000985489 0.000647245"/>
+                <joint name="right_elbow_yaw" class="arm_joint" axis="0 0 1" />
+                <geom type="mesh" mesh="right_elbow_yaw" material="green" />
+                
+                <body name="right_wrist_pitch_link" pos="0.006 9.9998e-05 -0.1394" quat="0.707105 0.707108 0 0">
+                  <inertial pos="-9.994e-05 0 0.00229425" quat="0.5 0.5 0.5 0.5" mass="0.00900738" diaginertia="5.7e-07 3.8e-07 2.4e-07"/>
+                  <joint name="right_wrist_pitch" class="arm_joint" axis="1 0 0" />
+                  <geom type="mesh" mesh="right_wrist_pitch" material="purple" />
+                  
+                  <body name="right_wrist_roll_link" pos="0 0 0" quat="0.707106 7.94894e-07 0.707108 7.94894e-07">
+                    <inertial pos="-0.0206623 -0.0314139 -0.00356965" quat="0.373433 0.844098 -0.329445 0.198775" mass="0.370899" diaginertia="0.000404077 0.000356841 0.000211598"/>
+                    <joint name="right_wrist_roll" class="arm_joint" axis="0 1 0" />
+                    <geom type="mesh" mesh="right_wrist_roll" material="red" />
+                    
+                    <!-- 添加末端执行器标记 -->
+                    <site name="end_effector" pos="0 0 -0.05" size="0.01" rgba="1 1 1 1" />
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <motor name="motor_right_shoulder_pitch" joint="right_shoulder_pitch" ctrlrange="-50 50" />
+    <motor name="motor_right_shoulder_roll" joint="right_shoulder_roll" ctrlrange="-50 50" />
+    <motor name="motor_right_shoulder_yaw" joint="right_shoulder_yaw" ctrlrange="-50 50" />
+    <motor name="motor_right_elbow_pitch" joint="right_elbow_pitch" ctrlrange="-50 50" />
+    <motor name="motor_right_elbow_yaw" joint="right_elbow_yaw" ctrlrange="-50 50" />
+    <motor name="motor_right_wrist_pitch" joint="right_wrist_pitch" ctrlrange="-18 18" />
+    <motor name="motor_right_wrist_roll" joint="right_wrist_roll" ctrlrange="-18 18" />
+  </actuator>
+
+  <sensor>
+    <!-- 关节位置传感器 -->
+    <jointpos name="jointpos_right_shoulder_pitch" joint="right_shoulder_pitch" noise="0" />
+    <jointpos name="jointpos_right_shoulder_roll" joint="right_shoulder_roll" noise="0" />
+    <jointpos name="jointpos_right_shoulder_yaw" joint="right_shoulder_yaw" noise="0" />
+    <jointpos name="jointpos_right_elbow_pitch" joint="right_elbow_pitch" noise="0" />
+    <jointpos name="jointpos_right_elbow_yaw" joint="right_elbow_yaw" noise="0" />
+    <jointpos name="jointpos_right_wrist_pitch" joint="right_wrist_pitch" noise="0" />
+    <jointpos name="jointpos_right_wrist_roll" joint="right_wrist_roll" noise="0" />
+    
+    <!-- 关节速度传感器 -->
+    <jointvel name="jointvel_right_shoulder_pitch" joint="right_shoulder_pitch" noise="0" />
+    <jointvel name="jointvel_right_shoulder_roll" joint="right_shoulder_roll" noise="0" />
+    <jointvel name="jointvel_right_shoulder_yaw" joint="right_shoulder_yaw" noise="0" />
+    <jointvel name="jointvel_right_elbow_pitch" joint="right_elbow_pitch" noise="0" />
+    <jointvel name="jointvel_right_elbow_yaw" joint="right_elbow_yaw" noise="0" />
+    <jointvel name="jointvel_right_wrist_pitch" joint="right_wrist_pitch" noise="0" />
+    <jointvel name="jointvel_right_wrist_roll" joint="right_wrist_roll" noise="0" />
+    
+    <!-- 末端执行器位置传感器 -->
+    <framepos name="end_effector_pos" objtype="site" objname="end_effector" />
+  </sensor>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0" />
+  </keyframe>
+</mujoco>
