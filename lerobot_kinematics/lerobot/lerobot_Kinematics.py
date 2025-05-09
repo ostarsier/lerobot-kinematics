@@ -69,11 +69,64 @@ def create_so100():
     
     return so100
 
+
+
+def create_x1():
+    # 创建x1机器人右臂的运动学模型
+    # 基于URDF文件中的关节信息
+    
+    # 到right_shoulder_pitch的变换
+    E1 = ET.tx(0)  # 从基座到右肩的X轴平移
+    E2 = ET.ty(0.256)  # 从基座到右肩的Y轴平移
+    E3 = ET.tz(0.1458)  # 从基座到右肩的Z轴平移
+    E4 = ET.Rz()  # 绕Z轴旋转（right_shoulder_pitch关节）
+    
+    # 到right_shoulder_roll的变换
+    E5 = ET.tx(0.0313)  # X轴平移0.0313米
+    E6 = ET.tz(-0.0592)  # Z轴平移-0.0592米
+    E7 = ET.Ry()  # 绕Y轴旋转（right_shoulder_roll关节）
+    
+    # 到right_shoulder_yaw的变换
+    E8 = ET.ty(-0.1252)  # Y轴平移-0.1252米
+    E9 = ET.tz(-0.0313)  # Z轴平移-0.0313米
+    E10 = ET.Rx()  # 绕X轴旋转（right_shoulder_yaw关节）
+    
+    # 到right_elbow_pitch的变换
+    E11 = ET.tx(-0.031)  # X轴平移-0.031米
+    E12 = ET.tz(0.0365)  # Z轴平移0.0365米
+    E13 = ET.Ry()  # 绕Y轴旋转（right_elbow_pitch关节）
+    
+    # 到right_elbow_yaw的变换
+    E14 = ET.ty(-0.117)  # Y轴平移-0.117米
+    E15 = ET.tz(0.031)  # Z轴平移0.031米
+    E16 = ET.Rx()  # 绕X轴旋转（right_elbow_yaw关节）
+    
+    # 到right_wrist_pitch的变换
+    E17 = ET.tx(0.006)  # X轴平移0.006米
+    E18 = ET.tz(-0.1394)  # Z轴平移-0.1394米
+    E19 = ET.Ry()  # 绕Y轴旋转（right_wrist_pitch关节）
+    
+    # 到right_wrist_roll的变换
+    E20 = ET.Rx()  # 绕X轴旋转（right_wrist_roll关节）
+    
+    # 组合所有变换，构建完整的机器人运动学链
+    x1 = E1 * E2 * E3 * E4 * E5 * E6 * E7 * E8 * E9 * E10 * E11 * E12 * E13 * E14 * E15 * E16 * E17 * E18 * E19 * E20
+    
+    # 设置关节限制范围（弧度）
+    # 第一行是各关节的最小值，第二行是各关节的最大值
+    x1.qlim = [[-3.14, -3.14, -3.14, -3.14, -3.14, -3.14, -3.14], 
+               [ 3.14,  3.14,  3.14,  3.14,  3.14,  3.14,  3.14]]
+    
+    return x1
+
+
 # 获取指定型号的机器人
 def get_robot(robot="so100"):
     # 目前仅支持SO100型号
     if robot == "so100":
         return create_so100()
+    elif robot == "x1":
+        return create_x1()
     else:
         print(f"Sorry, we don't support {robot} robot now")
         return None

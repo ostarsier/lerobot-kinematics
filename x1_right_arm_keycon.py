@@ -7,7 +7,7 @@ import threading
 from pynput import keyboard
 
 # 模型文件路径
-xml_path = '/Users/shelbin/code/github/lerobot-kinematics/x1/mjcf/xyber_x1_right_arm.xml'
+xml_path = './x1/mjcf/xyber_x1_right_arm.xml'
 
 # 关节名称列表
 joints = [
