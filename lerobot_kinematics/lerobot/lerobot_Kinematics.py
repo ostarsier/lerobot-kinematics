@@ -72,6 +72,7 @@ def create_so100():
 
 
 def create_x1():
+    
     # 创建x1机器人右臂的运动学模型
     # 基于URDF文件中的关节信息
     
